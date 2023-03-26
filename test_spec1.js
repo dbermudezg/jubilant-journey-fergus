@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'; 
-/*const fs = require('fs');
+const fs = require('fs');
 var fsp = require ('fs/promises');
 let obj = {
   table: []
@@ -75,7 +75,6 @@ fixture('Test 2')
   //await t.expect(deviceName.textContent).contains(systemNameData);
   await t.expect(Selector('html').textContent).contains(systemNameData);   
 });
-*/
 fixture('Test 3')
     .page('http://localhost:3001');
 //Make an API call that renames the first device of the list to “Rename Device”.
@@ -86,10 +85,7 @@ test('Get List of Elements from API Endpoint', async t => {
   const parameter = (jsonData[0]["id"]);
   //jsonData[0] = { id:parameter, system_name: "RENAMED DEVICE", type: "WINDOWS", hdd_capacity:'10'};
   jsonData[0] = { system_name: "RENAMED DEVICE"};
-  // Stringify the updated JSON data
-
   const updatedData = JSON.stringify(jsonData);
-  // PATCH the updated JSON data to the API endpoint
   const url = 'http://localhost:3000/devices/'+parameter
   await t.request({
     method: 'PUT',
@@ -110,11 +106,33 @@ test('Get List of Elements from API Endpoint', async t => {
   await t.expect(updatedJsonData[0]["system_name"]).eql('RENAMED DEVICE');
 });
 
-/*
 //Reload the page and verify the modified device has the new name.
 
 fixture('Test 4')
     .page('http://localhost:3001');
 //Make an API call that deletes the last element of the list.
-//Reload the page and verify the element is no longer visible and it doesn’t exist in the DOM.
-*/
+test('Get List of Elements from API Endpoint', async t => {
+  const endpointUrl = 'http://localhost:3000/devices';
+  const response = await t.request(endpointUrl);
+  const jsonData = response.body;
+  //var ultimo=JSON.stringify(jsonData.slice(-1));
+  function returnUltimo (){
+  const ultimo2 = JSON.stringify(jsonData.slice(-1)); 
+})
+  fixture('Test 4')
+    .page('http://localhost:3001');
+Make an API call that deletes the last element of the list.
+test('Get List of Elements from API Endpoint', async t => {
+  await t
+  .expect(Selector('html').textContent).contains(ultimo.system_name);
+   });
+test(`Assert '${ultimo.type}'`, async t => {
+await t
+   .expect(Selector('html').textContent).contains(ultimo.type);
+  });
+test(`Verify '${ultimo.hdd_capacity}'`, async t => {
+await t
+  .expect(Selector('html').textContent).contains(ultimo.hdd_capacity);
+  });
+
+
