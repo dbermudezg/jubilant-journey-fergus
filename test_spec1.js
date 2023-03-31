@@ -1,18 +1,15 @@
 import { Selector } from 'testcafe'; 
+import {clickSubmitButton, enterSystemName, selectValue, inputHddCapacity, validateElementExists} from './helpers.js';
 const fs = require('fs');
 var fsp = require ('fs/promises');
 let obj = {
   table: []
-};
+          };
 fixture('Test 1')
     .page('http://localhost:3001');
     test('Get List of Elements from API Endpoint', async t => {
     const endpointUrl = 'http://localhost:3000/devices';
     const response = await t.request(endpointUrl);
-    
-    //console.log(response)  
-    //await t.wait(10000)
-    // Assert that the 'elements' variable contains a list of elements
     await t.expect(response).ok();
     await t
         .expect(response.status).eql(200)
@@ -20,12 +17,7 @@ fixture('Test 1')
         .expect(response.headers).contains({ 'content-type': 'application/json; charset=utf-8' })
         const data = JSON.stringify(response.body);
         await fsp.writeFile("./users.json", data);
-    //const nData = (JSON.parse(data))
-    //console.log (nData);
     })
-
-
-  fixture('Test 1b')
       .page('http://localhost:3001');
       const data = require("./users.json");
             fixture `Data-Driven Tests: From the saved lists verify the data exists in the UI` 
@@ -42,48 +34,27 @@ fixture('Test 1')
               await t
                   .expect(Selector('html').textContent).contains(data.hdd_capacity);
       });
-    })  
-      
-fixture('Test 2')
-    .page('http://localhost:3001');
-
+    })
     test('Create a device on the UI and assert it exists.', async t => {
   // CREATE THE DEVICE
-  
-  const submitButton = Selector('.submitButton');
-  await t.expect(submitButton.exists).ok();
-  await t.click(submitButton);
-  
-  const systemNameInput = Selector('input[name="system_name"]');
-  await t.expect(systemNameInput.exists).ok();
-  const systemNameData = "testSystemName-Fergus3000";
-  await t.typeText(systemNameInput, systemNameData);
-  
-  const systemNameDropdown = Selector("#type");
-  await t.expect(systemNameDropdown.exists).ok();
-  await t.click(systemNameDropdown).click(Selector('option[value="MAC"]'));  
-  
-  const hddCapacity = Selector('input[name="hdd_capacity"]')
-  await t.expect(hddCapacity.exists).ok();
-  await t.typeText(hddCapacity, '100')
-  await t.expect(submitButton.exists).ok();
-  await t.click(submitButton);
-  //WE ASSERT IT EXISTS IN THE UI
   //await t.wait(10000)
-  //const deviceName = Selector("span.device-name");
-  //await t.expect(deviceName.exists).ok();
-  //await t.expect(deviceName.textContent).contains(systemNameData);
-  await t.expect(Selector('html').textContent).contains(systemNameData);   
+  const newElem="Fergus-Device-3000"
+  await clickSubmitButton();
+  await enterSystemName(newElem);
+  await selectValue("MAC");
+  await inputHddCapacity("100");
+  await clickSubmitButton();
+  
+  //WE ASSERT IT EXISTS IN THE UI
+  await validateElementExists(newElem);
 });
-fixture('Test 3')
-    .page('http://localhost:3001');
+
 //Make an API call that renames the first device of the list to “Rename Device”.
 test('Get List of Elements from API Endpoint', async t => {
   const endpointUrl = 'http://localhost:3000/devices';
   const response = await t.request(endpointUrl);
   const jsonData = response.body;
   const parameter = (jsonData[0]["id"]);
-  //jsonData[0] = { id:parameter, system_name: "RENAMED DEVICE", type: "WINDOWS", hdd_capacity:'10'};
   jsonData[0] = { system_name: "RENAMED DEVICE"};
   const updatedData = JSON.stringify(jsonData);
   const url = 'http://localhost:3000/devices/'+parameter
@@ -97,42 +68,25 @@ test('Get List of Elements from API Endpoint', async t => {
   });
 
   // Assert that the first element of the JSON data was successfully updated
-  const updatedResponse = await t.request('http://localhost:3000/devices/');
+  const updatedResponse = request('http://localhost:3000/devices/');
   const updatedJsonData = updatedResponse.body;
-  console.log("####UPDATED???#####")
-  console.log(updatedJsonData)
-  console.log("####DEBUG#####")
-  console.log(updatedJsonData[0]["system_name"])
   await t.expect(updatedJsonData[0]["system_name"]).eql('RENAMED DEVICE');
 });
 
-//Reload the page and verify the modified device has the new name.
-
-fixture('Test 4')
-    .page('http://localhost:3001');
 //Make an API call that deletes the last element of the list.
+
+
+//Assert stuff
 test('Get List of Elements from API Endpoint', async t => {
-  const endpointUrl = 'http://localhost:3000/devices';
-  const response = await t.request(endpointUrl);
-  const jsonData = response.body;
-  //var ultimo=JSON.stringify(jsonData.slice(-1));
-  function returnUltimo (){
-  const ultimo2 = JSON.stringify(jsonData.slice(-1)); 
-})
-  fixture('Test 4')
-    .page('http://localhost:3001');
-Make an API call that deletes the last element of the list.
-test('Get List of Elements from API Endpoint', async t => {
+const endpointUrl = 'http://localhost:3000/devices';
+const response = await t.request(endpointUrl);
+const jsonData = response.body;
+const ultimo = JSON.stringify(jsonData.slice(-1)); 
+console.log("##############################"+ultimo)
   await t
   .expect(Selector('html').textContent).contains(ultimo.system_name);
-   });
-test(`Assert '${ultimo.type}'`, async t => {
 await t
    .expect(Selector('html').textContent).contains(ultimo.type);
-  });
-test(`Verify '${ultimo.hdd_capacity}'`, async t => {
 await t
   .expect(Selector('html').textContent).contains(ultimo.hdd_capacity);
   });
-
-
